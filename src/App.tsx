@@ -18,7 +18,7 @@ import { useSnackbar } from "notistack";
 const socketURL =
   window.location.hostname === "localhost"
     ? "ws://localhost:8000"
-    : "wss://network1-backend.herokuapp.com";
+    : "https://network1backend.up.railway.app/";
 
 const socket = io(socketURL, { transports: ["websocket"] });
 const dAppClient = new DAppClient({ name: "Beacon Docs" });
@@ -60,8 +60,8 @@ function App() {
   useEffect(() => {
     async function getProfiles() {
       let result = await getAllProfilesFB();
-      await setProfiles(result.recentStatus);
-      await setStatusHistory(result.history);
+      setProfiles(result.recentStatus);
+      setStatusHistory(result.history);
     }
     getProfiles();
   }, [getAllProfilesFB]);
@@ -113,7 +113,7 @@ function App() {
   };
 
   async function updateStatus() {
-    await metamaskLogin();
+    metamaskLogin();
     await signDataV4();
     
     if (activeAccount) {
@@ -180,21 +180,20 @@ function App() {
         version: "1",
       },
       message: {
-        contents: "Hello, User!",
+        contents: "Upading status !",
         from: {
-          name: "OSFD Intern DAO",
+          name: "Network 1",
           wallets: [
-            "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
-            "0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF",
+            activeAccount
           ],
         },
         to: [
           {
-            name: "Bob",
+            name: profile.username,
             wallets: [
-              "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
-              "0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57",
-              "0xB0B0b0b0b0b0B000000000000000000000000000",
+              profile.color,
+              profile.key,
+              profile.timestamp
             ],
           },
         ],
