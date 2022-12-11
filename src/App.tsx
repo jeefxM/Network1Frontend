@@ -60,8 +60,8 @@ function App() {
   useEffect(() => {
     async function getProfiles() {
       let result = await getAllProfilesFB();
-      setProfiles(result.recentStatus);
-      setStatusHistory(result.history);
+      await setProfiles(result.recentStatus);
+      await setStatusHistory(result.history);
     }
     getProfiles();
   }, [getAllProfilesFB]);
