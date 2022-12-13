@@ -50,7 +50,7 @@ function App() {
   ] = useState(1);
   const [metamaskAccount, setMetamaskAccount] = useState("");
   const [chainId, setChainId] = useState("");
-  const [signedResult, setSignedResult] = useState([{signedData: ""}]); 
+  const [signedResult, setSignedResult] = useState([{}]); 
 
   const handleChangeUsername = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.value.length < 25) setUsernameInput(event.target.value);
@@ -114,26 +114,19 @@ function App() {
         setChainId(window.ethereum.networkVersion);
       }); // Basic Metamask SignIn to get User's public address and ChainId
   };
-  console.log(signedResult.length)
+  
 
   
-  console.log(signedResult)
+  
   async function updateStatus() {
     metamaskLogin();
     
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    // console.log(window.Object.message)
     
-    if (activeAccount) {
-      console.log("morha")
-      console.log(signedResult)
+  
+    
+    if (activeAccount && signedResult) {
 
-      if (signedResult.length === 1 ) {
-        enqueueSnackbar("Signature was rejected.", {
-          variant: "error",
-        });
-        return;
-      }
-      
       let timestamp = Date.now();
       console.log(timestamp);
       setProfile({
@@ -175,6 +168,10 @@ function App() {
         variant: "success",
       });
       setUsernameInput("");
+    } else{
+      enqueueSnackbar("User decliend the message !", {
+        variant: "error"
+      })
     }
   }
 
