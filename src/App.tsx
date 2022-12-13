@@ -50,13 +50,14 @@ function App() {
   ] = useState(1);
   const [metamaskAccount, setMetamaskAccount] = useState("");
   const [chainId, setChainId] = useState("");
-  const [signedResult, setSignedResult] = useState("");
+  const [signedResult, setSignedResult] = useState([{signedData: ""}]); 
 
   const handleChangeUsername = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.value.length < 25) setUsernameInput(event.target.value);
     else setUsernameInput(event.target.value.slice(0, 25));
   };
-
+  
+  
   useEffect(() => {
     async function getProfiles() {
       let result = await getAllProfilesFB();
@@ -68,10 +69,12 @@ function App() {
 
   useEffect(() => {
     const onProfileChange = (data) => {
+      
       setStatusHistory(
         statusHistory
           .concat(data)
           .sort((a, b) => parseFloat(b.timestamp) - parseFloat(a.timestamp))
+          
       );
 
       //recent
@@ -102,7 +105,7 @@ function App() {
       setActiveAccount(web3.currentProvider.selectedAddress);
     }
   }, []);
-
+  
   const metamaskLogin = () => {
     window.ethereum
       .request({ method: "eth_requestAccounts" })
@@ -111,12 +114,26 @@ function App() {
         setChainId(window.ethereum.networkVersion);
       }); // Basic Metamask SignIn to get User's public address and ChainId
   };
+  console.log(signedResult.length)
 
+  
+  console.log(signedResult)
   async function updateStatus() {
     metamaskLogin();
-    await signDataV4();
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     
     if (activeAccount) {
+      console.log("morha")
+      console.log(signedResult)
+
+      if (signedResult.length === 1 ) {
+        enqueueSnackbar("Signature was rejected.", {
+          variant: "error",
+        });
+        return;
+      }
+      
       let timestamp = Date.now();
       console.log(timestamp);
       setProfile({
@@ -142,17 +159,17 @@ function App() {
         timestamp: timestamp,
       });
       setStatusHistory(
-        statusHistory
-          .concat([
-            {
-              ...profile,
-              color: color,
-              key: activeAccount.address,
-              username: usernameInput,
-              timestamp: timestamp,
-            },
-          ])
-          .sort((a, b) => parseFloat(b.timestamp) - parseFloat(a.timestamp))
+          statusHistory
+            .concat([
+              {
+                ...profile,
+                color: color,
+                key: activeAccount.address,
+                username: usernameInput,
+                timestamp: timestamp,
+              },
+            ])
+            .sort((a, b) => parseFloat(b.timestamp) - parseFloat(a.timestamp))
       );
       enqueueSnackbar("Status Updated ! ", {
         variant: "success",
@@ -170,8 +187,10 @@ function App() {
   
 
   const signDataV4 = async () => {
+    
     const { ethereum } = window;
     const web3 = new Web3(window.ethereum);
+    console.log(profile)
     const msgParams = {
       domain: {
         chainId: chainId.toString(),
@@ -180,20 +199,21 @@ function App() {
         version: "1",
       },
       message: {
-        contents: "Upading status !",
+        contents:  profile.color,
         from: {
-          name: "Network 1",
+          name: usernameInput,
           wallets: [
-            activeAccount
+            activeAccount.toString()
+            
           ],
         },
         to: [
           {
-            name: profile.username,
+            name: "OSFD Network 1.0",
             wallets: [
-              profile.color,
-              profile.key,
-              profile.timestamp
+              "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+              "0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57",
+              "0xB0B0b0b0b0b0B000000000000000000000000000",
             ],
           },
         ],
@@ -227,11 +247,20 @@ function App() {
         method: "eth_signTypedData_v4",
         params: [from[0], JSON.stringify(msgParams)],
       });
-      setSignedResult(sign);
-      // puts the result in "signed-result" html element for using it in another function
+      setSignedResult(prevSignedResult => {
+        return [
+          ...prevSignedResult,
+          {signedData: sign}
+        ]
+      })
+      console.log(signedResult)
+      // puts the result in "signedResult" state
     } catch (err) {
       console.error(err);
     }
+
+    await updateStatus()
+    
   }; // Signing message with signTypedDataV4
 
   return (
@@ -284,7 +313,7 @@ function App() {
           overflowX: "scroll",
         }}
       >
-        {statusHistory &&
+        {signedResult ? statusHistory &&
           statusHistory.map((profile) => (
             <div
               key={profile.timestamp}
@@ -312,7 +341,7 @@ function App() {
                 {profile.username}{" "}
               </Button>
             </div>
-          ))}
+          )): ""}
       </div>
 
       <div style={{ fontSize: "0.9em", marginTop: 6, marginLeft: 13 }}>
@@ -404,7 +433,7 @@ function App() {
           <Button
             size={"small"}
             title={"update status"}
-            onClick={() => {updateStatus()}}
+            onClick={() => {signDataV4()}}
             
           >
             {" "}
@@ -427,25 +456,7 @@ function App() {
       </div>
       
 
-      <div
-        className="bottom-right"
-        style={{ position: "absolute", display: "flex", alignItems: "center" }}
-      >
-        {showUnsync && (
-          <Button
-            size={"small"}
-            title={"unsync"}
-            onClick={() => {
-              unsync();
-            }}
-          >
-            <u>unsync</u>{" "}
-          </Button>
-        )}
-
-        {showUnsync && <div> | </div>}
-        
-      </div>
+      
     </div>
   );
 }
