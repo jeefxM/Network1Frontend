@@ -57,6 +57,7 @@ function App() {
     else setUsernameInput(event.target.value.slice(0, 25));
   };
   
+  let signDataComplete = false;
   
   useEffect(() => {
     async function getProfiles() {
@@ -122,7 +123,9 @@ function App() {
     metamaskLogin();
     
     // console.log(window.Object.message)
-    
+    if (!signDataComplete) {
+      return;
+    }
   
     
     if (activeAccount && signedResult) {
@@ -251,12 +254,14 @@ function App() {
         ]
       })
       console.log(signedResult)
+      signDataComplete = true;
       // puts the result in "signedResult" state
     } catch (err) {
       console.error(err);
     }
+    
 
-    await updateStatus()
+    updateStatus()
     
   }; // Signing message with signTypedDataV4
 
