@@ -48,7 +48,7 @@ function App() {
     version,
     //setVersion
   ] = useState(1);
-  const [metamaskAccount, setMetamaskAccount] = useState("");
+  const [metamaskAccount, setMetamaskAccount] = useState(false);
   const [chainId, setChainId] = useState("");
   const [signedResult, setSignedResult] = useState([{}]); 
 
@@ -106,6 +106,8 @@ function App() {
       setActiveAccount(web3.currentProvider.selectedAddress);
     }
   }, []);
+
+  
   
   const metamaskLogin = () => {
     window.ethereum
@@ -124,6 +126,9 @@ function App() {
     
     // console.log(window.Object.message)
     if (!signDataComplete) {
+      enqueueSnackbar("You need to sign the message first!", {
+        variant: "error"
+      })
       return;
     }
   
@@ -300,7 +305,7 @@ function App() {
           <MenuItem value={3}> {versionNames[3]}</MenuItem>
         </Select>
         &nbsp; 📠
-        <Button style={{marginLeft: "auto"}} onClick={metamaskLogin}>{activeAccount ? `Sigend as: ${activeAccount}`: "Connect With Metamask"}</Button>
+        <Button style={{marginLeft: "auto"}} onClick={metamaskLogin}>{activeAccount ? `Signed as: ${activeAccount}`: "Connect With Metamask"}</Button>
       </div>
 
       <div style={{ fontSize: "0.9em", marginTop: 13, marginLeft: 13 }}>
