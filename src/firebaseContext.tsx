@@ -23,7 +23,7 @@ export const FirebaseContext = React.createContext<IFirebaseContext>({
 const fetchBase =
   process.env.NODE_ENV === "development"
     ? ""
-    : "https://network1backend.up.railway.app/";
+    : "https://network1backend.up.railway.app";
 
 export const FirebaseProvider: React.FC = ({ children }) => {
   const getProfileFB = useCallback(

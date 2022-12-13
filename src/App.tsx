@@ -18,7 +18,7 @@ import { useSnackbar } from "notistack";
 const socketURL =
   window.location.hostname === "localhost"
     ? "ws://localhost:8000"
-    : "https://network1backend.up.railway.app/";
+    : "https://network1backend.up.railway.app";
 
 const socket = io(socketURL, { transports: ["websocket"] });
 const dAppClient = new DAppClient({ name: "Beacon Docs" });
